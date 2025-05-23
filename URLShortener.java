@@ -61,7 +61,7 @@ public class URLShortener {
             exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
 
             String path = exchange.getRequestURI().getPath();
-            // Path format: /go/shortCode
+           
             String prefix = "/go/";
             if (!path.startsWith(prefix)) {
                 String response = "Invalid request";
@@ -103,7 +103,7 @@ public class URLShortener {
         return sb.toString();
     }
 
-    // --- Custom simple HashMap implementation ---
+    
     static class CustomHashMap {
         private static final int SIZE = 100;
         private Entry[] buckets;
@@ -116,7 +116,7 @@ public class URLShortener {
             int index = hash(key);
             Entry head = buckets[index];
 
-            // Update value if key already exists
+            
             for (Entry curr = head; curr != null; curr = curr.next) {
                 if (curr.key.equals(key)) {
                     curr.value = value;
@@ -124,7 +124,7 @@ public class URLShortener {
                 }
             }
 
-            // Insert new entry at head
+           
             Entry newEntry = new Entry(key, value);
             newEntry.next = head;
             buckets[index] = newEntry;
