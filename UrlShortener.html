@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simple URL Shortener</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #fff;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      backdrop-filter: blur(6px);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      margin-bottom: 12px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      margin: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #fff;
+      color: #764ba2;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #f0f0f0;
+    }
+
+    .result {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      word-break: break-word;
+    }
+
+    .error {
+      color: #ff6b6b;
+      font-weight: bold;
+    }
+
+    .loading {
+      font-size: 0.9rem;
+      margin-top: 10px;
+      color: #ffd;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>URL Shortener</h1>
+  <input type="text" id="longUrl" placeholder="Enter your long URL" />
+  <div>
+    <button id="shortenBtn">Shorten</button>
+    <button id="clearBtn">Clear</button>
+  </div>
+  <div id="loading" class="loading" style="display: none;">Shortening URL...</div>
+  <div id="result" class="result" style="display: none;"></div>
+</div>
+
+<script>
+  const longUrlInput = document.getElementById('longUrl');
+  const resultDiv = document.getElementById('result');
+  const loadingDiv = document.getElementById('loading');
+  const shortenBtn = document.getElementById('shortenBtn');
+  const clearBtn = document.getElementById('clearBtn');
+
+  // Focus input on load
+  window.onload = () => {
+    longUrlInput.focus();
+  };
+
+  // Trigger shorten on Enter
+  longUrlInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') shortenUrl();
+  });
+
+  shortenBtn.addEventListener('click', shortenUrl);
+  clearBtn.addEventListener('click', () => {
+    longUrlInput.value = '';
+    resultDiv.style.display = 'none';
+    loadingDiv.style.display = 'none';
+    longUrlInput.focus();
+  });
+
+  async function shortenUrl() {
+    const longUrl = longUrlInput.value.trim();
+
+    if (!longUrl) {
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = '<span class="error">Please enter a valid URL.</span>';
+      return;
+    }
+
+    resultDiv.style.display = 'none';
+    loadingDiv.style.display = 'block';
+
+    try {
+      const response = await fetch(`http://localhost:8080/shorten?url=${encodeURIComponent(longUrl)}`);
+      if (!response.ok) throw new Error('Error shortening URL.');
+
+      const shortCode = await response.text();
+      const shortUrl = `http://localhost:8080/go/${shortCode}`;
+
+      loadingDiv.style.display = 'none';
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = `Shortened URL: <a href="${shortUrl}" target="_blank" style="color:#ffdd57">${shortUrl}</a>`;
+    } catch (error) {
+      loadingDiv.style.display = 'none';
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = `<span class="error">${error.message}</span>`;
+    }
+  }
+</script>
+</body>
+</html>
